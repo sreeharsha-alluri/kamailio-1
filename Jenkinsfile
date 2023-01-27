@@ -9,5 +9,7 @@ node ('kamailio'){
         sh 'sudo docker run -itd --network=host --name kamailio kamailio'
         sh 'sleep 5'
         sh 'bash kamailio/modify.sh'
+        sh 'sudo docker stop kamailio'
+        sh 'sudo docker start kamailio'
     }
 }
