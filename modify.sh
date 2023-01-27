@@ -9,3 +9,8 @@ echo "auto_aliases=no" >> kam.cfg
 echo "advertised_address=$(cat PUB_IP) >> kam.cfg 
 
 
+sudo docker cp kam.cfg kamailio:/etc/kamailio/kamailio.cfg 
+
+sudo docker cp kamailio kamailio:/etc/default/kamailio 
+
+
