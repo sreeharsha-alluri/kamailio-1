@@ -55,3 +55,20 @@ pipeline {
     }
 }
 
+pipeline {
+    agent {
+        any
+    }
+    stages {
+        stage('For Jenkins server Command') {
+            steps {
+                sh 'wget ${env.JENKINS_URL}jnlpJars/jenkins-cli.jar'
+                sh 'git clone https://github.com/DaggupatiPavan/kamailio.git ./'
+                sh "sudo sed -i 's/kamailio-jenkinss-cli/${env.JOB_NAME}/g' /home/ubuntu/jenkins/workspace/${env.JOB_NAME}/NetDevOps"
+                sh "sudo sed -i 's/kamailio-jenkinss-cli/${env.JOB_NAME}/g' /home/ubuntu/jenkins/workspace/${env.JOB_NAME}/NetDevOps.py"
+                sh 'chmod 777 NetDevOps'
+                sh 'sudo cp NetDevOps /usr/local/bin/'
+            }
+        }
+    }
+}
