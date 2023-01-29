@@ -1,6 +1,6 @@
 #!/bin/bash
 
-curl https://ipv4.icanhazip.com > myip
+curl -s https://ipv4.icanhazip.com > myip
 PUBLIC_IP=$(cat myip)
 
 while [ $# -gt 0 ]
@@ -42,4 +42,4 @@ then
 fi
 
 # Execute the Jenkins CLI commands with the provided IP and parameters
-java -jar $(pwd)/jenkins-cli.jar -s http://$PUBLIC_IP:8080 -auth admin:tcs@12345 build kamailio-jenkinss-cli -p validate=$VALIDATE -p service=$SERVICE -p cloud=$CLOUD -p form_factor=$FORM_FACTOR && java -jar $(pws)/jenkins-cli.jar -s http://$PUBLIC_IP:8080 -auth admin:tcs@12345 console kamailio-jenkinss-cli
+java -jar /var/lib/jenkins/workspace/kamailio-jenkinss-cli/jenkins-cli.jar -s http://$PUBLIC_IP:8080 -auth admin:tcs@12345 build kamailio-jenkinss-cli -p validate=$VALIDATE -p service=$SERVICE -p cloud=$CLOUD -p form_factor=$FORM_FACTOR && java -jar /var/lib/jenkins/workspace/kamailio-jenkinss-cli/jenkins-cli.jar -s http://$PUBLIC_IP:8080 -auth admin:tcs@12345 console kamailio-jenkinss-cli
