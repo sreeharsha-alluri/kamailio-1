@@ -55,7 +55,7 @@
 //     }
 // }
 
-node ('default-node') {
+node ('Built-In Node') {
     stage('For Jenkins server Command') {  
         sh 'rm -rf *'
         sh '''#!/bin/bash
