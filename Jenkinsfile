@@ -47,7 +47,7 @@ pipeline {
                 sh "sudo docker rm -f kamailio"
                 sh "sudo docker run -itd --network=host --name kamailio kgopi424/kamailio:v-1.${BUILD_NUMBER}"
                 sh 'sleep 5'
-                sh 'bash kamailio/modify.sh'
+                sh 'bash modify.sh'
                 sh 'sudo docker stop kamailio'
                 sh 'sudo docker start kamailio'
             }
