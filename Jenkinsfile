@@ -21,7 +21,7 @@ pipeline {
         }
         stage('Cloning') {
             steps {
-//                 sh "rm -rf *"
+                sh "rm -rf .git"
 //                 sh "git clone https://github.com/DaggupatiPavan/kamailio.git ./" 
                 sh "sudo sed -i 's/-1.0/-1.${BUILD_NUMBER}/g' /home/ubuntu/jenkins/workspace/${env.JOB_NAME}/kamailio/Test.yaml"
                 sh "sudo sed -i 's/kamailio-jenkinss-cli/${env.JOB_NAME}/g' /home/ubuntu/jenkins/workspace/${env.JOB_NAME}/kamailio/NetDevOps"
