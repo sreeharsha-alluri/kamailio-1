@@ -1,0 +1,45 @@
+#!/bin/bash
+
+curl https://ipv4.icanhazip.com > myip
+PUBLIC_IP=$(cat myip)
+
+while [ $# -gt 0 ]
+do
+  case "$1" in
+    --validate=*)
+      VALIDATE="${1#*=}"
+      ;;
+    --service=*)
+      SERVICE="${1#*=}"
+      ;;
+    --cloud=*)
+      CLOUD="${1#*=}"
+      ;;
+    --form_factor=*)
+      FORM_FACTOR="${1#*=}"
+      ;;
+    *)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+# Verify that all arguments were passed
+if [ -z "$VALIDATE" ] || [ -z "$SERVICE" ] || [ -z "$CLOUD" ] || [ -z "$FORM_FACTOR" ]
+then
+  echo "Please provide all arguments: --validate=value --service=value --cloud=value --form_factor=value"
+  exit 1
+fi
+
+# Check if the cloud parameter is valid
+if [ "$CLOUD" != "Aws" ] && [ "$CLOUD" != "Azure" ]
+then
+  echo "Invalid value for parameter cloud: $CLOUD"
+  echo "Accepted values are: Aws or Azure"
+  exit 1
+fi
+
+# Execute the Jenkins CLI commands with the provided IP and parameters
+java -jar /home/ubuntu/jenkins/jenkins-cli.jar -s http://$PUBLIC_IP:8080 -auth admin:tcs@12345 build kamailio-jenkinss-cli -p validate=$VALIDATE -p service=$SERVICE -p cloud=$CLOUD -p form_factor=$FORM_FACTOR && java -jar /home/ubuntu/jenkins/jenkins-cli.jar -s http://$PUBLIC_IP:8080 -auth admin:tcs@12345 console kamailio-jenkinss-cli
