@@ -11,6 +11,6 @@ echo "advertised_address=$(cat PUB_IP)" >> kam.cfg
 
 sudo docker cp kamailio/kam.cfg kamailio:/etc/kamailio/kamailio.cfg 
 
-sudo docker cp kamailio/kamailio:/etc/default/kamailio 
+sudo docker cp kamailio/kamailio kamailio:/etc/default/kamailio 
 
 
