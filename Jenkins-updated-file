@@ -133,9 +133,8 @@ pipeline {
         label 'ec2-medium'
       }
       steps { 
-        sh 'docker exec -itd sipp sipp -sn uac -s pavan -r 20 -d 10000 -rp 5060 $(hostname -I | cut -d " " -f 1) -trace_stat -timeout 30s'
+        sh 'docker exec -itd sipp sipp -sn uac -s gopi -r 20 -d 10000 -rp 5060 $(hostname -I | cut -d " " -f 1) -trace_stat -timeout 30s'
         sh 'sleep 10'
-        sh 'sleep 20'
         sh 'chmod 777 copy-logs.sh'
         sh ''' 
         #! /bin/bash/
