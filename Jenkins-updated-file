@@ -1,0 +1,160 @@
+pipeline {
+    agent any
+    parameters {
+        choice(name: 'validate', choices: ['small', 'medium', 'full'], description: 'Choose the validate level')
+        string(name: 'service', defaultValue: 'IMS', description: 'Service')
+        choice(name: 'cloud', choices: ['Azure', 'Aws'], description: 'Cloud provider')
+        string(name: 'form_factor', defaultValue: 'CNF', description: 'Form factor')
+    }
+  stages {
+    stage('clonning'){
+            steps{
+                node('slave1'){
+                    sh "rm -rf *"
+                    sh "rm -rf .git"
+                    sh "git clone https://github.com/DaggupatiPavan/kamailio.git ./"
+                    sh "sudo sed -i 's/-1.0/-1.${BUILD_NUMBER}/g' /home/ubuntu/jenkins/workspace/${env.JOB_NAME}/Test.yaml"
+                    sh 'pwd'
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                node('slave1') {
+                    script{
+                        if(params.cloud == "Aws" && params.form_factor == "CNF" && params.service == "IMS"){
+                            sh "kubectl delete pod kaniko"
+                            sh "kubectl apply -f /home/ubuntu/jenkins/workspace/${env.JOB_NAME}/Test.yaml"
+                            sh 'sleep 180'
+                        }
+                        else{
+                            echo "unable to build this is not Azure cloud"
+                        }
+                    }
+                }
+            }
+        }
+        stage('Vulnerability scanning'){
+            steps{
+                node('slave1'){
+                    sh "docker pull kgopi424/kamailio:v-1.${BUILD_NUMBER}"
+                    sh "grype kgopi424/kamailio:v-1.${BUILD_NUMBER}"
+                }
+            }
+        }
+        
+    
+    stage('Deploying in small machine') {
+      when {
+        expression { params.validate == 'small' || params.validate == 'full' }
+      }
+      agent {
+        label 'ec2-small'
+      }
+      steps {
+        script{
+            if(params.cloud == "Aws" && params.form_factor == "CNF"){
+                sh "rm -rf *"
+                sh "rm -rf .git"
+                sh "git clone https://github.com/DaggupatiPavan/kamailio.git ./"
+                sh "sudo docker rm -f kamailio sipp"
+                sh "sudo docker run -itd --network=host --name kamailio -p 5060:5060/udp kgopi424/kamailio:v-1.${BUILD_NUMBER}"
+                sh "sudo docker run -itd --name sipp -p 5061:5061 -p 5060:5060 --network host pavan176/sipp:v3.7.0"
+                sh 'bash modify.sh'
+                sh 'sudo docker restart kamailio'
+                sh '''echo "Register this $(cat PUB_IP) IP in Zoiper" '''
+                sh 'sleep 140'
+            }
+            if(params.cloud == "Azure" && params.form_factor == "CNF"){
+                echo "Not a Azure CLoud"
+            }   
+        }
+      }
+    }
+    stage('Testing in small machine') {
+      when {
+        expression { params.validate == 'small' || params.validate == 'full' }
+      }
+      agent {
+        label 'ec2-small'
+      }
+      steps { 
+        sh ''' 
+            #!/bin/bash/
+            docker exec sipp sipp -sn uac -s pavan -r 20 -d 10000 -rp 5060 172.31.31.138 -trace_stat  -timeout 30s 
+            '''
+            sh 'sleep 20'
+            sh 'chmod 777 copy-logs.sh'
+            sh ''' 
+            #! /bin/bash/
+            mkdir -p /home/ubuntu/LOGS/
+            for i in $(docker exec sipp sh -c "ls *.csv")
+            do
+            #echo $i
+            docker cp sipp:/$i /home/ubuntu/LOGS/ 2>/dev/null
+            done '''
+            
+            sh ''' 
+            #!/bin/bash 
+            docker logs kamailio > /home/ubuntu/LOGS/kamailio.logs
+            '''
+      }
+    }
+    stage('Deploying in medium machine') {
+      when {
+        expression { params.validate == 'medium' || params.validate == 'full' }
+      }
+      agent {
+        label 'ec2-medium'
+      }
+      steps {
+        script{
+            if(params.cloud == "Aws" && params.form_factor == "CNF"){
+                sh "rm -rf *"
+                sh "rm -rf .git"
+                sh "git clone https://github.com/DaggupatiPavan/kamailio.git ./"
+                sh "sudo docker rm -f kamailio sipp"
+                sh "sudo docker run -itd --network=host --name kamailio -p 5060:5060/udp kgopi424/kamailio:v-1.${BUILD_NUMBER}"
+                sh "sudo docker run -itd --name sipp -p 5061:5061 -p 5060:5060 --network host pavan176/sipp:v3.7.0"
+                sh 'bash modify.sh'
+                sh 'sudo docker restart kamailio'
+                sh '''echo "Register this $(cat PUB_IP) IP in Zoiper" '''
+                sh 'sleep 140'
+            }
+            if(params.cloud == "Azure" && params.form_factor == "CNF"){
+                echo "Not a Azure CLoud"
+            }
+        }
+      }
+    }
+    stage('Testing in medium machine') {
+      when {
+        expression { params.validate == 'medium' || params.validate == 'full' }
+      }
+      agent {
+        label 'ec2-medium'
+      }
+      steps { 
+        sh ''' 
+            #!/bin/bash/
+            docker exec sipp sipp -sn uac -s gopi -r 20 -d 10000 -rp 5060 172.31.31.138 -trace_stat  -timeout 30s 
+            '''
+            sh 'sleep 20'
+            sh 'chmod 777 copy-logs.sh'
+            sh ''' 
+            #! /bin/bash/
+            mkdir -p /home/ubuntu/LOGS/
+            for i in $(docker exec sipp sh -c "ls *.csv")
+            do
+            #echo $i
+            docker cp sipp:/$i /home/ubuntu/LOGS/ 2>/dev/null
+            done '''
+            
+            sh ''' 
+            #!/bin/bash 
+            docker logs kamailio > /home/ubuntu/LOGS/kamailio.logs
+            '''
+      }
+    }
+  }
+}
