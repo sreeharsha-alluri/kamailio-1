@@ -63,7 +63,7 @@ pipeline {
                 sh 'bash modify.sh'
                 sh 'sudo docker restart kamailio'
                 sh '''echo "Register this $(cat PUB_IP) IP in Zoiper" '''
-                sh 'sleep 140'
+                sh 'sleep 10'
             }
             if(params.cloud == "Azure" && params.form_factor == "CNF"){
                 echo "Not a Azure CLoud"
@@ -79,25 +79,23 @@ pipeline {
         label 'ec2-small'
       }
       steps { 
+        sh 'docker exec -itd sipp sipp -sn uac -s pavan -r 20 -d 10000 -rp 5060 $(hostname -I | cut -d " " -f 1) -trace_stat -timeout 30s'
+        sh 'sleep 10'
+        sh 'sleep 20'
+        sh 'chmod 777 copy-logs.sh'
         sh ''' 
-            #!/bin/bash/
-            docker exec sipp sipp -sn uac -s pavan -r 20 -d 10000 -rp 5060 172.31.31.138 -trace_stat  -timeout 30s 
-            '''
-            sh 'sleep 20'
-            sh 'chmod 777 copy-logs.sh'
-            sh ''' 
-            #! /bin/bash/
-            mkdir -p /home/ubuntu/LOGS/
-            for i in $(docker exec sipp sh -c "ls *.csv")
-            do
-            #echo $i
-            docker cp sipp:/$i /home/ubuntu/LOGS/ 2>/dev/null
-            done '''
-            
-            sh ''' 
-            #!/bin/bash 
-            docker logs kamailio > /home/ubuntu/LOGS/kamailio.logs
-            '''
+        #! /bin/bash/
+        mkdir -p /home/ubuntu/LOGS/
+        for i in $(docker exec sipp sh -c "ls *.csv")
+        do
+        #echo $i
+        docker cp sipp:/$i /home/ubuntu/LOGS/ 2>/dev/null
+        done '''
+        
+        sh ''' 
+        #!/bin/bash 
+        docker logs kamailio > /home/ubuntu/LOGS/kamailio.logs
+        '''
       }
     }
     stage('Deploying in medium machine') {
@@ -119,7 +117,7 @@ pipeline {
                 sh 'bash modify.sh'
                 sh 'sudo docker restart kamailio'
                 sh '''echo "Register this $(cat PUB_IP) IP in Zoiper" '''
-                sh 'sleep 140'
+                sh 'sleep 10'
             }
             if(params.cloud == "Azure" && params.form_factor == "CNF"){
                 echo "Not a Azure CLoud"
@@ -135,25 +133,23 @@ pipeline {
         label 'ec2-medium'
       }
       steps { 
+        sh 'docker exec -itd sipp sipp -sn uac -s pavan -r 20 -d 10000 -rp 5060 $(hostname -I | cut -d " " -f 1) -trace_stat -timeout 30s'
+        sh 'sleep 10'
+        sh 'sleep 20'
+        sh 'chmod 777 copy-logs.sh'
         sh ''' 
-            #!/bin/bash/
-            docker exec sipp sipp -sn uac -s gopi -r 20 -d 10000 -rp 5060 172.31.31.138 -trace_stat  -timeout 30s 
-            '''
-            sh 'sleep 20'
-            sh 'chmod 777 copy-logs.sh'
-            sh ''' 
-            #! /bin/bash/
-            mkdir -p /home/ubuntu/LOGS/
-            for i in $(docker exec sipp sh -c "ls *.csv")
-            do
-            #echo $i
-            docker cp sipp:/$i /home/ubuntu/LOGS/ 2>/dev/null
-            done '''
-            
-            sh ''' 
-            #!/bin/bash 
-            docker logs kamailio > /home/ubuntu/LOGS/kamailio.logs
-            '''
+        #! /bin/bash/
+        mkdir -p /home/ubuntu/LOGS/
+        for i in $(docker exec sipp sh -c "ls *.csv")
+        do
+        #echo $i
+        docker cp sipp:/$i /home/ubuntu/LOGS/ 2>/dev/null
+        done '''
+        
+        sh ''' 
+        #!/bin/bash 
+        docker logs kamailio > /home/ubuntu/LOGS/kamailio.logs
+        '''
       }
     }
   }
