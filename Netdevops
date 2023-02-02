@@ -1,0 +1,86 @@
+#!/bin/bash
+
+# Get the public IP address
+PUBLIC_IP=$(curl -s https://ipv4.icanhazip.com)
+
+
+# Parse input parameters
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --validate=*)
+      VALIDATE="${1#*=}"
+      ;;
+    --service=*)
+      SERVICE="${1#*=}"
+      ;;
+    --cloud=*)
+      CLOUD="${1#*=}"
+      ;;
+    --form_factor=*)
+      FORM_FACTOR="${1#*=}"
+      ;;
+    --job=*)
+      JOB="${1#*=}"
+      ;;
+    *)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+# Validate input parameters
+if [ -z "$VALIDATE" ] || [ -z "$SERVICE" ] || [ -z "$CLOUD" ] || [ -z "$FORM_FACTOR" ]; then
+  echo "Please provide all arguments: --validate=small or medium or full --service=IMS --cloud=Aws or Azure --form_factor=CNF --job=JOB_NAME"
+  exit 1
+fi
+
+# Check if the validate parameter is valid
+if [ "$VALIDATE" != "full" ] && [ "$VALIDATE" != "small" ] && [ "$VALIDATE" != "medium" ]; then
+  echo "Invalid value for parameter validate: $VALIDATE"
+  echo "Accepted values are: full, small, or medium"
+  exit 1
+fi
+
+# Check if the cloud parameter is valid
+if [ "$CLOUD" != "Aws" ] && [ "$CLOUD" != "Azure" ]; then
+  echo "Invalid value for parameter cloud: $CLOUD"
+  echo "Accepted values are: Aws or Azure"
+  exit 1
+fi
+
+# Check if the service parameter is valid
+if [ "$SERVICE" != "IMS" ]; then
+  echo "Invalid value for parameter service: $SERVICE"
+  echo "Accepted values are: IMS"
+  exit 1
+fi
+
+# Check if the form_factor parameter is valid
+if [ "$FORM_FACTOR" != "CNF" ]; then
+  echo "Invalid value for parameter form_factor: $FORM_FACTOR"
+  echo "Accepted values are: CNF"
+  exit 1
+fi
+
+if [ -z "$JOB" ]; then
+  echo "select the applicable Job to trigger" 
+  java -jar /home/ubuntu/jenkins/jenkins-cli.jar -s "http://${PUBLIC_IP}:8080" -auth admin:tcs@12345 list-jobs 
+  exit 1 
+fi 
+
+# Execute the Jenkins CLI commands with the provided IP and parameters
+java -jar /home/ubuntu/jenkins/jenkins-cli.jar \
+  -s "http://$PUBLIC_IP:8080" \
+  -auth "admin:tcs@12345" \
+  build $JOB \
+  -p validate="$VALIDATE" \
+  -p service="$SERVICE" \
+  -p cloud="$CLOUD" \
+  -p form_factor="$FORM_FACTOR" \
+  && \
+  java -jar /home/ubuntu/jenkins/jenkins-cli.jar \
+  -s "http://$PUBLIC_IP:8080" \
+  -auth "admin:tcs@12345" \
+  console $JOB
