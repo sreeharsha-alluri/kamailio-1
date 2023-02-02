@@ -12,6 +12,7 @@ parser.add_argument('--validate', required=True)
 parser.add_argument('--service', required=True)
 parser.add_argument('--cloud', required=True)
 parser.add_argument('--form_factor', required=True)
+parser.add_argument('--job', required=True)
 args = parser.parse_args()
 
 # Validate input parameters
@@ -40,7 +41,7 @@ command1 = [
     'java', '-jar', '/home/ubuntu/jenkins/jenkins-cli.jar',
     '-s', 'http://{}:8080'.format(PUBLIC_IP),
     '-auth', 'admin:tcs@12345',
-    'build', 'jenkins',
+    'build', args.job,
     '-p', 'validate={}'.format(args.validate),
     '-p', 'service={}'.format(args.service),
     '-p', 'cloud={}'.format(args.cloud),
@@ -51,8 +52,9 @@ command2 = [
     'java', '-jar', '/home/ubuntu/jenkins/jenkins-cli.jar',
     '-s', 'http://{}:8080'.format(PUBLIC_IP),
     '-auth', 'admin:tcs@12345',
-    'console', 'jenkins'
+    'console', args.job
 ]
 
 subprocess.run(command1)
 subprocess.run(command2)
+
