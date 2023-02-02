@@ -40,7 +40,7 @@ command1 = [
     'java', '-jar', '/home/ubuntu/jenkins/jenkins-cli.jar',
     '-s', 'http://{}:8080'.format(PUBLIC_IP),
     '-auth', 'admin:tcs@12345',
-    'build', 'kamailio-jenkinss-cli',
+    'build', 'jenkins',
     '-p', 'validate={}'.format(args.validate),
     '-p', 'service={}'.format(args.service),
     '-p', 'cloud={}'.format(args.cloud),
@@ -51,7 +51,7 @@ command2 = [
     'java', '-jar', '/home/ubuntu/jenkins/jenkins-cli.jar',
     '-s', 'http://{}:8080'.format(PUBLIC_IP),
     '-auth', 'admin:tcs@12345',
-    'console', 'kamailio-jenkinss-cli'
+    'console', 'jenkins'
 ]
 
 subprocess.run(command1)
