@@ -22,5 +22,5 @@ VOLUME /etc/kamailio
 
 # clean
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
+COPY kam.cfg /etc/kamailio/kamailio.cfg
 ENTRYPOINT ["kamailio", "-DD", "-E"]
