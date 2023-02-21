@@ -8,7 +8,7 @@ spec:
     image: gcr.io/kaniko-project/executor:latest
     args:
     - "--context=git://github.com/DaggupatiPavan/Kamailio"
-    - "--destination=kgopi424/kamailio:v-1.0"
+    - "--destination=kgopi424/kamailio"
     volumeMounts:
     - name: kaniko-secret
       mountPath: /kaniko/.docker
