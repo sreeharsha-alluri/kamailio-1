@@ -1,12 +1,12 @@
 apiVersion: ec2.aws.crossplane.io/v1alpha1
 kind: Instance
 metadata:
-  name: sample-instance-new
+  name: crosplane-instance
 spec:
   forProvider:
     region: us-east-1
     imageId: ami-09cd747c78a9add63
-    instanceType: t2.micro
+    instanceType: machine
     keyName: test2
     tags:
       - key: Name
