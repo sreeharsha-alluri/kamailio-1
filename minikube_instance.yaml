@@ -1,17 +1,17 @@
 apiVersion: ec2.aws.crossplane.io/v1alpha1
 kind: Instance
 metadata:
-  name: crossplane-minikube
+  name: crossplane-mini-volume
 spec:
   forProvider:
     region: us-east-1
     imageId: ami-09cd747c78a9add63
     instanceType: machine
-    keyName: test2
     blockDeviceMappings:
-      - deviceName: /dev/sda1
-        ebs:
-          volumeSize: 20
+      - deviceName: /dev/sda1
+        ebs:
+          volumeSize: 40
+    keyName: test2
     tags:
       - key: Name
         value: test-crossplane-new
