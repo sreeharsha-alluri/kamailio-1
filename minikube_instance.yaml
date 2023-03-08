@@ -8,6 +8,10 @@ spec:
     imageId: ami-09cd747c78a9add63
     instanceType: machine
     keyName: test2
+    blockDeviceMappings:
+      - deviceName: /dev/sda1
+        ebs:
+          volumeSize: 20
     tags:
       - key: Name
         value: test-crossplane-new
