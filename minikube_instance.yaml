@@ -9,9 +9,9 @@ spec:
     instanceType: machine
     keyName: test2
     blockDeviceMappings:
-      deviceName: /dev/sda1
-      ebs:
-        volumeSize: 20
+      - deviceName: /dev/sda1
+        ebs:
+          volumeSize: 20
     tags:
       - key: Name
         value: test-crossplane-new
