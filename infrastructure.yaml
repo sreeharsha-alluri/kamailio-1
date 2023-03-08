@@ -1,0 +1,130 @@
+apiVersion: ec2.aws.crossplane.io/v1beta1
+kind: VPC
+metadata:
+  name: crossplane-vpc
+spec:
+  forProvider:
+    region: us-east-1
+    cidrBlock: 192.168.0.0/16
+    enableDnsSupport: true
+    enableDnsHostNames: true
+    tags:
+    - key: Environment
+      value: crossplane
+    - key: Owner
+      value: tcs
+    - key: Name
+      value: crossplane-vpc
+    instanceTenancy: default
+  providerConfigRef:
+    name: default 
+
+---
+
+
+apiVersion: ec2.aws.crossplane.io/v1beta1
+kind: Subnet
+metadata:
+  name: crossplane-subnet-1
+spec:
+  forProvider:
+    region: us-east-1
+    availabilityZone: us-east-1a
+    cidrBlock: 192.168.1.0/24
+    vpcIdRef:
+       name: crossplane-vpc
+    tags:
+    - key: Environment
+      value: crossplane
+    - key: Name
+      value: crossplane-subnet-1
+    - key: Owner
+      value: tcs
+    mapPublicIPOnLaunch: true
+  providerConfigRef:
+    name: default
+
+---
+
+apiVersion: ec2.aws.crossplane.io/v1beta1
+kind: Subnet
+metadata:
+  name: crossplane-subnet-2
+spec:
+  forProvider:
+    region: us-east-1
+    availabilityZone: us-east-1b
+    cidrBlock: 192.168.2.0/24
+    vpcIdRef:
+      name: crossplane-vpc
+    tags:
+    - key: Environment
+      value: crossplane
+    - key: Name
+      value: crossplane-subnet-2
+    - key: Owner
+      value: tcs
+    mapPublicIPOnLaunch: true
+  providerConfigRef:
+    name: default
+
+---
+
+apiVersion: ec2.aws.crossplane.io/v1beta1
+kind: InternetGateway
+metadata:
+  name: crossplane-internetgateway
+spec:
+  forProvider:
+    region: us-east-1
+    vpcIdRef:
+      name: crossplane-vpc
+  providerConfigRef:
+    name: default
+---
+
+
+apiVersion: ec2.aws.crossplane.io/v1beta1
+kind: RouteTable
+metadata:
+  name: crossplane-routetable
+spec:
+  forProvider:
+    region: us-east-1
+    routes:
+      - destinationCidrBlock: 0.0.0.0/0
+        gatewayIdRef:
+          name: crossplane-internetgateway
+    associations:
+      - subnetIdRef:
+          name: crossplane-subnet-2
+      - subnetIdRef:
+          name: crossplane-subnet-1
+    vpcIdRef:
+      name: crossplane-vpc
+  providerConfigRef:
+    name: default
+---
+
+apiVersion: ec2.aws.crossplane.io/v1beta1
+kind: SecurityGroup
+metadata:
+  name: crossplane-security-group
+spec:
+  forProvider:
+    region: us-east-1
+    vpcIdRef:
+      name: crossplane-vpc
+    groupName: crossplane-sg
+    description: Enable rds access
+    egress:
+      # AWS will treat it as all ports any protocol
+      - ipProtocol: '-1'
+        ipRanges:
+          - cidrIp: 0.0.0.0/0
+    ingress:
+      - ipProtocol: '-1'
+        ipRanges:
+          - cidrIp: 0.0.0.0/0
+  providerConfigRef:
+    name: default
