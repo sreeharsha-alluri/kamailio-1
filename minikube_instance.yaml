@@ -14,7 +14,7 @@ spec:
     keyName: test2
     tags:
       - key: Name
-        value: test-crossplane-new
+        value: test-crossplane-minikube
     subnetIdRef:
       name: crossplane-subnet-1
     securityGroupRefs:
