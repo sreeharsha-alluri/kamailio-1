@@ -1,0 +1,85 @@
+apiVersion: compute.gcp.upbound.io/v1beta1
+kind: Instance
+metadata:
+  annotations:
+    meta.upbound.io/example-id: compute/v1beta1/instance
+  labels:
+    testing.upbound.io/example-name: example_instance
+  name: example-instance
+spec:
+  forProvider:
+    bootDisk:
+    - initializeParams:
+      - image: debian-cloud/debian-11
+    machineType: e2-medium
+    metadata:
+      environment: dev
+    metadataStartupScript: echo 'Upbound!' > /test.txt
+    networkInterface:
+    - accessConfig:
+      - {}
+      networkSelector:
+        matchLabels:
+          testing.upbound.io/example-name: example_instance_network
+      subnetworkSelector:
+        matchLabels:
+          testing.upbound.io/example-name: example_instance_network
+    tags:
+    - foo
+    - bar
+    zone: us-east1-b
+
+---
+
+apiVersion: compute.gcp.upbound.io/v1beta1
+kind: Network
+metadata:
+  annotations:
+    meta.upbound.io/example-id: compute/v1beta1/instance
+  labels:
+    testing.upbound.io/example-name: example_instance_network
+  name: example-instance-network
+spec:
+  forProvider:
+    autoCreateSubnetworks: false
+
+---
+
+apiVersion: compute.gcp.upbound.io/v1beta1
+kind: Subnetwork
+metadata:
+  annotations:
+    meta.upbound.io/example-id: compute/v1beta1/instance
+  labels:
+    testing.upbound.io/example-name: example_instance_network
+  name: example-instance-subnetwork
+spec:
+  forProvider:
+    ipCidrRange: 10.0.0.0/16
+    networkSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example_instance_network
+    region: us-east1
+
+---
+
+apiVersion: compute.gcp.upbound.io/v1beta1
+kind: Firewall
+metadata:
+  annotations:
+    meta.upbound.io/example-id: compute/v1beta1/firewall
+  labels:
+    testing.upbound.io/example-name: example_firewall
+  name: example-firewall
+spec:
+  forProvider:
+    allow:
+    - protocol: tcp
+    - ports:
+      - "22"
+      protocol: tcp
+    direction: INGRESS
+    networkSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example_instance_network
+    sourceRanges: ["0.0.0.0/0"]
