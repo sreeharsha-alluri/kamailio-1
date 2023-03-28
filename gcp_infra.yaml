@@ -14,7 +14,7 @@ spec:
     machineType: e2-medium
     metadata:
       environment: dev
-    metadataStartupScript: echo 'Upbound!' > /test.txt
+    metadataStartupScript: mkdir -p /home/kgopi424/.ssh && echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCs2lxSfrRyyhPBF5eo03QC6VHYBxwnFUOBM5aZH6jB6HuZQ+TzdFeRI/JScAONuKtqYDe6b/88zDk0X/Y8Ksg5jBX3nTVIaIODBm+N9IVvapFhhcTxCiIMLw5LrRAF0Ek1KwHDhVThcGN2cOS/k77RNBgg/uWeDyZsaUB7IMpbNRvJqtFjPmpwrl+KXNiF7EirUKKSsvTqDiw5EYbH2Pja1KZM2sD0b2ZD4vlWsdA4cbmt6l05USQwKD1lMHNn5aEiRbOvqnSuucYrBa6XuXYojkgFB96szly9KryKmcZqrrcDHOr6HOg94xQs5WzRCPLCkk082ceomjuSqFn7Hbtx kgopi424" > /home/kgopi424/.ssh/authorized_keys
     networkInterface:
     - accessConfig:
       - {}
@@ -25,9 +25,8 @@ spec:
         matchLabels:
           testing.upbound.io/example-name: example_instance_network
     tags:
-    - foo
-    - bar
-    zone: us-east1-b
+    - test
+    zone: us-south1-a
 
 ---
 
@@ -59,7 +58,7 @@ spec:
     networkSelector:
       matchLabels:
         testing.upbound.io/example-name: example_instance_network
-    region: us-east1
+    region: us-south1
 
 ---
 
