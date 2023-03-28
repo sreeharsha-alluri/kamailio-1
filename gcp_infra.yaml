@@ -10,7 +10,7 @@ spec:
   forProvider:
     bootDisk:
     - initializeParams:
-      - image: debian-cloud/debian-11
+      - image: ubuntu-os-cloud/ubuntu-2004-lts
     machineType: e2-medium
     metadata:
       environment: dev
