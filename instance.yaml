@@ -6,7 +6,7 @@ spec:
   forProvider:
     region: us-east-1
     imageId: ami-09cd747c78a9add63
-    instanceType: machine
+    instanceType: t2.micro
     keyName: test2
     tags:
       - key: Name
