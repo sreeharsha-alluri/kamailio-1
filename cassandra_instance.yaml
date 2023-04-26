@@ -1,0 +1,19 @@
+apiVersion: ec2.aws.crossplane.io/v1alpha1
+kind: Instance
+metadata:
+  name: cassandra
+spec:
+  forProvider:
+    region: us-east-1
+    imageId: ami-0f9dd9881504e9128
+    instanceType: t2.micro
+    keyName: test2
+    tags:
+      - key: Name
+        value: cassandra-vm
+    subnetIdRef:
+      name: crossplane-subnet-2
+    securityGroupRefs:
+      - name: crossplane-security-group
+  providerConfigRef:
+    name: default
